@@ -1,11 +1,3 @@
-# Moonbit Github Workflows
+# illusory0x0/conv
 
-This CI configuration was modified from [moonbitlang/core CI](https://github.com/moonbitlang/core/blob/main/.github/workflows/check.yml)
-
-## Modified
-
-* moon bundle
-* coverage-check
-* license-header-check
-
-
+This library is adapted from [moonbitlang/core](https://github.com/moonbitlang/core/tree/main/strconv)

@@ -1,0 +1,37 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "illusory0x0/conv/string_conv"
+
+// Values
+fn[A : FromStringView] parse(String) -> A raise StrConvError
+
+fn parse_bool(StringView) -> Bool raise StrConvError
+
+fn parse_double(StringView) -> Double raise StrConvError
+
+fn parse_int(StringView, base? : Int) -> Int raise StrConvError
+
+fn parse_int64(StringView, base? : Int) -> Int64 raise StrConvError
+
+fn parse_uint(StringView, base? : Int) -> UInt raise StrConvError
+
+fn parse_uint64(StringView, base? : Int) -> UInt64 raise StrConvError
+
+// Errors
+pub(all) suberror StrConvError String
+impl Show for StrConvError
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+pub(open) trait FromStringView {
+  from(StringView) -> Self raise StrConvError
+}
+impl FromStringView for Bool
+impl FromStringView for Int
+impl FromStringView for Int64
+impl FromStringView for UInt
+impl FromStringView for UInt64
+impl FromStringView for Double
+
