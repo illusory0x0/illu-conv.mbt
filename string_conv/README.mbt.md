@@ -5,6 +5,7 @@ A MoonBit library for parsing various data types from `String` and `StringView`,
 ## Quick Start
 
 ```moonbit
+///|
 test "basic usage" {
   // Parse integers from strings
   let num = @string_conv.parse_int("42")
@@ -25,6 +26,7 @@ test "basic usage" {
 All parsing functions can raise `StrConvError` when the input cannot be parsed:
 
 ```moonbit
+///|
 test "error handling" {
   // Using try? to get Result type
   let result = try? @string_conv.parse_int("invalid")
@@ -32,13 +34,13 @@ test "error handling" {
     Ok(_) =>
       @json.inspect("Should not reach here", content="Should not reach here")
     Err(@string_conv.StrConvError(msg)) =>
-      @json.inspect(msg, content=("invalid syntax"))
+      @json.inspect(msg, content="invalid syntax")
   }
 
   // Handle specific errors
   let safe_result = @string_conv.parse_double("not_a_number") catch {
     @string_conv.StrConvError(msg) => {
-      @json.inspect(msg, content=("invalid syntax"))
+      @json.inspect(msg, content="invalid syntax")
       0.0
     }
   }
@@ -53,6 +55,7 @@ test "error handling" {
 Parse integers from `StringView` with optional base specification:
 
 ```moonbit
+///|
 test "parse_int examples" {
   // Default base 10
   @json.inspect(@string_conv.parse_int("123"), content=123)
@@ -74,6 +77,7 @@ test "parse_int examples" {
 Parse 64-bit integers from `StringView`:
 
 ```moonbit
+///|
 test "parse_int64 examples" {
   inspect(
     @string_conv.parse_int64("9223372036854775807"),
@@ -85,14 +89,8 @@ test "parse_int64 examples" {
   )
 
   // With different bases
-  inspect(
-    @string_conv.parse_int64("deadbeef", base=16),
-    content="3735928559",
-  )
-  inspect(
-    @string_conv.parse_int64("1111000011110000", base=2),
-    content="61680",
-  )
+  inspect(@string_conv.parse_int64("deadbeef", base=16), content="3735928559")
+  inspect(@string_conv.parse_int64("1111000011110000", base=2), content="61680")
 }
 ```
 
@@ -101,6 +99,7 @@ test "parse_int64 examples" {
 Parse unsigned integers from `StringView`:
 
 ```moonbit
+///|
 test "parse_uint examples" {
   inspect(@string_conv.parse_uint("4294967295"), content="4294967295")
   inspect(@string_conv.parse_uint("0"), content="0")
@@ -116,6 +115,7 @@ test "parse_uint examples" {
 Parse 64-bit unsigned integers from `StringView`:
 
 ```moonbit
+///|
 test "parse_uint64 examples" {
   inspect(
     @string_conv.parse_uint64("18446744073709551615"),
@@ -138,6 +138,7 @@ test "parse_uint64 examples" {
 Parse double-precision floating point numbers from `StringView`:
 
 ```moonbit
+///|
 test "parse_double examples" {
   @json.inspect(@string_conv.parse_double("3.14159"), content=3.14159)
   @json.inspect(@string_conv.parse_double("-2.718"), content=-2.718)
@@ -162,6 +163,7 @@ test "parse_double examples" {
 Parse boolean values from `StringView`:
 
 ```moonbit
+///|
 test "parse_bool examples" {
   // True values
   @json.inspect(@string_conv.parse_bool("true"), content=true)
@@ -184,6 +186,7 @@ test "parse_bool examples" {
 Generic parsing function that works with any type implementing `FromStringView` and takes a `String` input:
 
 ```moonbit
+///|
 test "generic parse examples" {
   // Parse integers from String
   let int_val : Int = @string_conv.parse("42")
@@ -215,6 +218,7 @@ The `FromStringView` trait enables types to be parsed from `StringView`. Built-i
 - `Double`
 
 ```moonbit
+///|
 test "trait usage examples" {
   // Using trait methods directly
   let int_result = @string_conv.FromStringView::from("100")
@@ -236,12 +240,13 @@ test "trait usage examples" {
 All parsing functions can raise `StrConvError` when conversion fails:
 
 ```moonbit
+///|
 test "error examples" {
   // Integer parsing errors
   let int_err = try? @string_conv.parse_int("abc")
   match int_err {
     Err(@string_conv.StrConvError(msg)) =>
-      @json.inspect(msg, content=("invalid syntax"))
+      @json.inspect(msg, content="invalid syntax")
     _ => @json.inspect("unexpected", content="unexpected")
   }
 
@@ -249,7 +254,7 @@ test "error examples" {
   let double_err = try? @string_conv.parse_double("not_a_number")
   match double_err {
     Err(@string_conv.StrConvError(msg)) =>
-      @json.inspect(msg, content=("invalid syntax"))
+      @json.inspect(msg, content="invalid syntax")
     _ => @json.inspect("unexpected", content="unexpected")
   }
 
@@ -257,7 +262,7 @@ test "error examples" {
   let bool_err = try? @string_conv.parse_bool("maybe")
   match bool_err {
     Err(@string_conv.StrConvError(msg)) =>
-      @json.inspect(msg, content=("invalid syntax"))
+      @json.inspect(msg, content="invalid syntax")
     _ => @json.inspect("unexpected", content="unexpected")
   }
 }
@@ -268,6 +273,7 @@ test "error examples" {
 ### Working with StringView
 
 ```moonbit
+///|
 test "stringview usage" {
   let data = "123,456,789"
   let parts_array = data.split(",").to_array()
@@ -283,6 +289,7 @@ test "stringview usage" {
 ### String vs StringView
 
 ```moonbit
+///|
 test "string vs stringview" {
   let original = "42"
 
@@ -302,6 +309,7 @@ test "string vs stringview" {
 ### Base Conversion Examples
 
 ```moonbit
+///|
 test "base conversion showcase" {
   let binary = "11010110"
   let octal = "326"
@@ -319,6 +327,7 @@ test "base conversion showcase" {
 ### Unicode and International Numbers
 
 ```moonbit
+///|
 test "unicode support" {
   // Standard ASCII digits
   @json.inspect(@string_conv.parse_int("12345"), content=12345)

@@ -5,6 +5,7 @@ A MoonBit library for parsing various data types from `BytesView`, providing eff
 ## Quick Start
 
 ```moonbit
+///|
 test "basic usage" {
   // Parse integers from bytes
   let num = @bytes_conv.parse_int(b"42")
@@ -25,6 +26,7 @@ test "basic usage" {
 All parsing functions can raise `StrConvError` when the input cannot be parsed:
 
 ```moonbit
+///|
 test "error handling" {
   // Using try? to get Result type
   let result = try? @bytes_conv.parse_int(b"invalid")
@@ -53,6 +55,7 @@ test "error handling" {
 Parse integers from `BytesView` with optional base specification:
 
 ```moonbit
+///|
 test "parse_int examples" {
   // Default base 10
   @json.inspect(@bytes_conv.parse_int(b"123"), content=123)
@@ -74,6 +77,7 @@ test "parse_int examples" {
 Parse 64-bit integers from `BytesView`:
 
 ```moonbit
+///|
 test "parse_int64 examples" {
   inspect(
     @bytes_conv.parse_int64(b"9223372036854775807"),
@@ -85,14 +89,8 @@ test "parse_int64 examples" {
   )
 
   // With different bases
-  inspect(
-    @bytes_conv.parse_int64(b"deadbeef", base=16),
-    content="3735928559",
-  )
-  inspect(
-    @bytes_conv.parse_int64(b"1111000011110000", base=2),
-    content="61680",
-  )
+  inspect(@bytes_conv.parse_int64(b"deadbeef", base=16), content="3735928559")
+  inspect(@bytes_conv.parse_int64(b"1111000011110000", base=2), content="61680")
 }
 ```
 
@@ -101,6 +99,7 @@ test "parse_int64 examples" {
 Parse unsigned integers from `BytesView`:
 
 ```moonbit
+///|
 test "parse_uint examples" {
   inspect(@bytes_conv.parse_uint(b"4294967295"), content="4294967295")
   inspect(@bytes_conv.parse_uint(b"0"), content="0")
@@ -116,6 +115,7 @@ test "parse_uint examples" {
 Parse 64-bit unsigned integers from `BytesView`:
 
 ```moonbit
+///|
 test "parse_uint64 examples" {
   inspect(
     @bytes_conv.parse_uint64(b"18446744073709551615"),
@@ -138,6 +138,7 @@ test "parse_uint64 examples" {
 Parse double-precision floating point numbers from `BytesView`:
 
 ```moonbit
+///|
 test "parse_double examples" {
   @json.inspect(@bytes_conv.parse_double(b"3.14159"), content=3.14159)
   @json.inspect(@bytes_conv.parse_double(b"-2.718"), content=-2.718)
@@ -162,6 +163,7 @@ test "parse_double examples" {
 Parse boolean values from `BytesView`:
 
 ```moonbit
+///|
 test "parse_bool examples" {
   // True values
   @json.inspect(@bytes_conv.parse_bool(b"true"), content=true)
@@ -184,6 +186,7 @@ test "parse_bool examples" {
 Generic parsing function that works with any type implementing `FromBytesView`:
 
 ```moonbit
+///|
 test "generic parse examples" {
   // Parse integers
   let int_val : Int = @bytes_conv.parse(b"42")
@@ -215,6 +218,7 @@ The `FromBytesView` trait enables types to be parsed from `BytesView`. Built-in 
 - `Double`
 
 ```moonbit
+///|
 test "trait usage examples" {
   // Using trait methods directly
   let int_result = @bytes_conv.FromBytesView::from(b"100")
@@ -236,6 +240,7 @@ test "trait usage examples" {
 All parsing functions can raise `StrConvError` when conversion fails:
 
 ```moonbit
+///|
 test "error examples" {
   // Integer parsing errors
   let int_err = try? @bytes_conv.parse_int(b"abc")
@@ -268,6 +273,7 @@ test "error examples" {
 ### Working with BytesView
 
 ```moonbit
+///|
 test "bytesview usage" {
   // Work with individual BytesViews
   let part1 = b"123"
@@ -285,6 +291,7 @@ test "bytesview usage" {
 ### Base Conversion Examples
 
 ```moonbit
+///|
 test "base conversion showcase" {
   let binary = b"11010110"
   let octal = b"326"
