@@ -6,7 +6,7 @@
   "license": "Apache-2.0",
   "keywords": [
     "string",
-    "bytes", 
+    "bytes",
     "conversion",
     "parsing",
     "numeric",
