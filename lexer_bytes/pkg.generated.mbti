@@ -1,0 +1,37 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "illusory0x0/lexer/lexer_bytes"
+
+// Values
+fn[A : FromBytesView] tokenize(BytesView) -> A raise StrConvError
+
+fn tokenize_bool(BytesView) -> Bool raise StrConvError
+
+fn tokenize_double(BytesView) -> Double raise StrConvError
+
+fn tokenize_int(BytesView, base? : Int) -> Int raise StrConvError
+
+fn tokenize_int64(BytesView, base? : Int) -> Int64 raise StrConvError
+
+fn tokenize_uint(BytesView, base? : Int) -> UInt raise StrConvError
+
+fn tokenize_uint64(BytesView, base? : Int) -> UInt64 raise StrConvError
+
+// Errors
+pub(all) suberror StrConvError String
+impl Show for StrConvError
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+pub(open) trait FromBytesView {
+  from(BytesView) -> Self raise StrConvError
+}
+impl FromBytesView for Bool
+impl FromBytesView for Int
+impl FromBytesView for Int64
+impl FromBytesView for UInt
+impl FromBytesView for UInt64
+impl FromBytesView for Double
+

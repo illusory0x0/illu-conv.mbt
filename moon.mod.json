@@ -1,10 +1,13 @@
 {
-  "name": "illusory0x0/conv",
-  "version": "0.1.1",
+  "name": "illusory0x0/lexer",
+  "version": "0.1.0",
   "readme": "README.md",
-  "repository": "https://github.com/illusory0x0/illu-conv.mbt",
+  "repository": "https://github.com/illusory0x0/illu-lexer.mbt",
   "license": "Apache-2.0",
   "keywords": [
+    "tokenize",
+    "parser",
+    "lexer",
     "string",
     "bytes",
     "conversion",
@@ -12,7 +15,9 @@
     "numeric",
     "integer",
     "decimal",
-    "boolean"
+    "boolean",
+    "payload",
+    "helper"
   ],
-  "description": "A MoonBit library for string and bytes conversion, providing efficient parsing functionality for integers, decimals, booleans and other data types with support for multiple numeric bases and comprehensive error handling."
+  "description": "A MoonBit tokenization library for parsing Token payloads from strings and bytes. Provides efficient tokenization functionality for integers, decimals, booleans and other data types with support for multiple numeric bases, comprehensive error handling, and convenient helper functions for token processing."
 }

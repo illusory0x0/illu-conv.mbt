@@ -1,0 +1,37 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "illusory0x0/lexer/lexer_string"
+
+// Values
+fn[A : FromStringView] tokenize(String) -> A raise StrConvError
+
+fn tokenize_bool(StringView) -> Bool raise StrConvError
+
+fn tokenize_double(StringView) -> Double raise StrConvError
+
+fn tokenize_int(StringView, base? : Int) -> Int raise StrConvError
+
+fn tokenize_int64(StringView, base? : Int) -> Int64 raise StrConvError
+
+fn tokenize_uint(StringView, base? : Int) -> UInt raise StrConvError
+
+fn tokenize_uint64(StringView, base? : Int) -> UInt64 raise StrConvError
+
+// Errors
+pub(all) suberror StrConvError String
+impl Show for StrConvError
+
+// Types and methods
+
+// Type aliases
+
+// Traits
+pub(open) trait FromStringView {
+  tokenize(StringView) -> Self raise StrConvError
+}
+impl FromStringView for Bool
+impl FromStringView for Int
+impl FromStringView for Int64
+impl FromStringView for UInt
+impl FromStringView for UInt64
+impl FromStringView for Double
+
