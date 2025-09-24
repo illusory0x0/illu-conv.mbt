@@ -1,3 +1,6 @@
 {
-    "test-import": ["illusory0x0/lexer/lexer_bytes", "illusory0x0/lexer/lexer_string"]
+  "test-import": [
+    "illusory0x0/lexer/lexer_bytes",
+    "illusory0x0/lexer/lexer_string"
+  ]
 }
