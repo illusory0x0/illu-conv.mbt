@@ -13,10 +13,13 @@ A MoonBit tokenization library for parsing Token payloads from strings and bytes
 
 ## Packages
 
-This library consists of two main packages:
+This library consists of three main packages:
 
 - `lexer_string`: Tokenization from `StringView` and `String`
-- `lexer_bytes`: Tokenization from `BytesView` and `Bytes`
+- `lexer_bytes`: Tokenization from `BytesView` and `Bytes`  
+- `conv_error`: Common error types shared between lexer packages (contains `LexError`)
+
+For end users, import either `lexer_string` or `lexer_bytes` depending on your input type. The `conv_error` package is used internally and provides the underlying `LexError` type that both lexer packages expose as `StrConvError` for backward compatibility.
 
 ## Quick Start
 
@@ -91,7 +94,7 @@ test "generic parsing" {
 
 ## Error Handling
 
-All tokenization functions can raise `StrConvError` for invalid input:
+All tokenization functions can raise `StrConvError` for invalid input. Internally, this uses the common `LexError` type from the `conv_error` package:
 
 ```moonbit
 ///|

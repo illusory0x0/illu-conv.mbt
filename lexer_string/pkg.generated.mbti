@@ -2,6 +2,18 @@
 package "illusory0x0/lexer/lexer_string"
 
 // Values
+fn[T] base_err() -> T raise StrConvError
+
+let base_err_str : String
+
+fn[T] range_err() -> T raise StrConvError
+
+let range_err_str : String
+
+fn[T] syntax_err() -> T raise StrConvError
+
+let syntax_err_str : String
+
 fn[A : FromStringView] tokenize(String) -> (A, Int) raise StrConvError
 
 fn tokenize_bool(StringView) -> (Bool, Int) raise StrConvError

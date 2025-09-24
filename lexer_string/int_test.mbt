@@ -21,7 +21,7 @@ let base_err = "invalid base"
 ///|
 fn tokenize_as_result(s : String, base~ : Int) -> Result[Int64, String] {
   try @lexer_string.tokenize_int64(s, base~).0 |> Ok catch {
-    StrConvError(err) => Err(err)
+    @lexer_string.StrConvError(err) => Err(err)
   }
 }
 

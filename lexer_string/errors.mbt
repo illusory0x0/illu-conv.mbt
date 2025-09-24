@@ -13,6 +13,7 @@
 // limitations under the License.
 
 ///|
+// Backward compatibility wrapper for LexError
 pub(all) suberror StrConvError String
 
 ///|
@@ -23,25 +24,25 @@ pub impl Show for StrConvError with output(self, logger) {
 }
 
 ///|
-let range_err_str = "value out of range"
+pub let range_err_str : String = @conv_error.range_err_str
 
 ///|
-let syntax_err_str = "invalid syntax"
+pub let syntax_err_str : String = @conv_error.syntax_err_str
 
 ///|
-let base_err_str = "invalid base"
+pub let base_err_str : String = @conv_error.base_err_str
 
 ///|
-fn[T] range_err() -> T raise StrConvError {
-  raise StrConvError(range_err_str)
+pub fn[T] range_err() -> T raise StrConvError {
+  raise StrConvError(@conv_error.range_err_str)
 }
 
 ///|
-fn[T] syntax_err() -> T raise StrConvError {
-  raise StrConvError(syntax_err_str)
+pub fn[T] syntax_err() -> T raise StrConvError {
+  raise StrConvError(@conv_error.syntax_err_str)
 }
 
 ///|
-fn[T] base_err() -> T raise StrConvError {
-  raise StrConvError(base_err_str)
+pub fn[T] base_err() -> T raise StrConvError {
+  raise StrConvError(@conv_error.base_err_str)
 }

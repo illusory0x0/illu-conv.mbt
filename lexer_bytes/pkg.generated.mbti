@@ -2,6 +2,18 @@
 package "illusory0x0/lexer/lexer_bytes"
 
 // Values
+fn[T] base_err() -> T raise StrConvError
+
+let base_err_str : String
+
+fn[T] range_err() -> T raise StrConvError
+
+let range_err_str : String
+
+fn[T] syntax_err() -> T raise StrConvError
+
+let syntax_err_str : String
+
 fn[A : FromBytesView] tokenize(BytesView) -> (A, Int) raise StrConvError
 
 fn tokenize_bool(BytesView) -> (Bool, Int) raise StrConvError
