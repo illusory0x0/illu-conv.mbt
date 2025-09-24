@@ -19,7 +19,7 @@ test "try_fast_path overflow when shift is too large" {
   // triggering line 130
   let result = @lexer_bytes.tokenize_double("9007199254740992e30")
   // The function successfully falls back to slow path
-  inspect(result, content="9.007199254740992e+45")
+  inspect(result, content="(9.007199254740992e+45, 19)")
 }
 
 ///|
@@ -28,12 +28,12 @@ test "try_fast_path overflow when mantissa is too large" {
   // line 133 will be triggered
   let result = @lexer_bytes.tokenize_double("9007199254740992e23")
   // The function successfully falls back to slow path
-  inspect(result, content="9.007199254740991e+38")
+  inspect(result, content="(9.007199254740991e+38, 19)")
 }
 
 ///|
 test "corner cases" {
-  inspect(try? @lexer_bytes.tokenize_double(".123"), content="Ok(0.123)")
+  inspect(try? @lexer_bytes.tokenize_double(".123"), content="Ok((0.123, 4))")
   inspect(try? @lexer_bytes.tokenize_double("."), content="Err(invalid syntax)")
   inspect(try? @lexer_bytes.tokenize_double("-"), content="Err(invalid syntax)")
 }

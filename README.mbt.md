@@ -26,22 +26,28 @@ This library consists of two main packages:
 ///|
 test "string tokenization basics" {
   // Parse integers with different bases
-  let decimal = @lexer_string.tokenize_int("123")
+  let (decimal, advance_len) = @lexer_string.tokenize_int("123")
   @json.inspect(decimal, content=123)
-  let hex = @lexer_string.tokenize_int("0xFF", base=16)
+  @json.inspect(advance_len, content=3)
+  let (hex, advance_len) = @lexer_string.tokenize_int("0xFF", base=16)
   @json.inspect(hex, content=255)
-  let binary = @lexer_string.tokenize_int("1010", base=2)
+  @json.inspect(advance_len, content=4)
+  let (binary, advance_len) = @lexer_string.tokenize_int("1010", base=2)
   @json.inspect(binary, content=10)
+  @json.inspect(advance_len, content=4)
 
   // Parse floating point numbers
-  let pi = @lexer_string.tokenize_double("3.14159")
+  let (pi, advance_len) = @lexer_string.tokenize_double("3.14159")
   @json.inspect(pi, content=3.14159)
+  @json.inspect(advance_len, content=7)
 
   // Parse booleans
-  let flag_true = @lexer_string.tokenize_bool("true")
+  let (flag_true, advance_len) = @lexer_string.tokenize_bool("true")
   @json.inspect(flag_true, content=true)
-  let flag_false = @lexer_string.tokenize_bool("false")
+  @json.inspect(advance_len, content=4)
+  let (flag_false, advance_len) = @lexer_string.tokenize_bool("false")
   @json.inspect(flag_false, content=false)
+  @json.inspect(advance_len, content=5)
 }
 ```
 
@@ -51,12 +57,15 @@ test "string tokenization basics" {
 ///|
 test "bytes tokenization basics" {
   // Parse from byte sequences
-  let number = @lexer_bytes.tokenize_int(b"456")
+  let (number, len) = @lexer_bytes.tokenize_int(b"456")
   @json.inspect(number, content=456)
-  let hex_bytes = @lexer_bytes.tokenize_uint(b"DEADBEEF", base=16)
+  @json.inspect(len, content=3)
+  let (hex_bytes, len2) = @lexer_bytes.tokenize_uint(b"DEADBEEF", base=16)
   @json.inspect(hex_bytes, content=3735928559)
-  let float_bytes = @lexer_bytes.tokenize_double(b"2.71828")
+  @json.inspect(len2, content=8)
+  let (float_bytes, len3) = @lexer_bytes.tokenize_double(b"2.71828")
   @json.inspect(float_bytes, content=2.71828)
+  @json.inspect(len3, content=7)
 }
 ```
 
@@ -66,12 +75,17 @@ test "bytes tokenization basics" {
 ///|
 test "generic parsing" {
   // Using FromStringView trait for generic parsing
-  let int_result : Int = @lexer_string.tokenize("42")
+  let (int_result, advance_len) : (Int, Int) = @lexer_string.tokenize("42")
   @json.inspect(int_result, content=42)
-  let double_result : Double = @lexer_string.tokenize("3.14")
+  @json.inspect(advance_len, content=2)
+  let (double_result, advance_len) : (Double, Int) = @lexer_string.tokenize(
+    "3.14",
+  )
   @json.inspect(double_result, content=3.14)
-  let bool_result : Bool = @lexer_string.tokenize("true")
+  @json.inspect(advance_len, content=4)
+  let (bool_result, advance_len) : (Bool, Int) = @lexer_string.tokenize("true")
   @json.inspect(bool_result, content=true)
+  @json.inspect(advance_len, content=4)
 }
 ```
 
@@ -129,16 +143,19 @@ test "error handling" {
 ///|
 test "custom bases" {
   // Base 36 (maximum supported base)
-  let base36 = @lexer_string.tokenize_int("ZZ", base=36)
+  let (base36, advance_len) = @lexer_string.tokenize_int("ZZ", base=36)
   @json.inspect(base36, content=1295) // Z=35, so ZZ = 35*36 + 35 = 1295
+  @json.inspect(advance_len, content=2)
 
   // Base 8 (octal)
-  let octal = @lexer_string.tokenize_int("755", base=8)
+  let (octal, advance_len) = @lexer_string.tokenize_int("755", base=8)
   @json.inspect(octal, content=493) // 7*64 + 5*8 + 5 = 493
+  @json.inspect(advance_len, content=3)
 
   // Base 2 (binary)
-  let binary = @lexer_string.tokenize_int("11111111", base=2)
+  let (binary, advance_len) = @lexer_string.tokenize_int("11111111", base=2)
   @json.inspect(binary, content=255)
+  @json.inspect(advance_len, content=8)
 }
 ```
 
@@ -148,16 +165,23 @@ test "custom bases" {
 ///|
 test "integer sizes" {
   // 64-bit integers for large numbers
-  let large_num = @lexer_string.tokenize_int64("9223372036854775807")
+  let (large_num, advance_len) = @lexer_string.tokenize_int64(
+    "9223372036854775807",
+  )
   inspect(large_num, content="9223372036854775807")
+  inspect(advance_len, content="19")
 
   // Unsigned integers for positive-only values
-  let unsigned = @lexer_string.tokenize_uint("4294967295")
+  let (unsigned, advance_len) = @lexer_string.tokenize_uint("4294967295")
   inspect(unsigned, content="4294967295")
+  inspect(advance_len, content="10")
 
   // 64-bit unsigned for very large positive numbers  
-  let big_unsigned = @lexer_string.tokenize_uint64("18446744073709551615")
+  let (big_unsigned, advance_len) = @lexer_string.tokenize_uint64(
+    "18446744073709551615",
+  )
   inspect(big_unsigned, content="18446744073709551615")
+  inspect(advance_len, content="20")
 }
 ```
 
@@ -169,12 +193,17 @@ The library provides trait implementations that allow for generic parsing:
 ///|
 test "trait usage examples" {
   // Direct usage of the parse function with explicit types
-  let int_token : Int = @lexer_string.tokenize("123")
+  let (int_token, advance_len) : (Int, Int) = @lexer_string.tokenize("123")
   @json.inspect(int_token, content=123)
-  let double_token : Double = @lexer_string.tokenize("45.67")
+  @json.inspect(advance_len, content=3)
+  let (double_token, advance_len) : (Double, Int) = @lexer_string.tokenize(
+    "45.67",
+  )
   @json.inspect(double_token, content=45.67)
-  let bool_token : Bool = @lexer_string.tokenize("false")
+  @json.inspect(advance_len, content=5)
+  let (bool_token, advance_len) : (Bool, Int) = @lexer_string.tokenize("false")
   @json.inspect(bool_token, content=false)
+  @json.inspect(advance_len, content=5)
 }
 ```
 
@@ -189,7 +218,7 @@ test "token payload processing" {
   fn safe_parse_int_token(payload : String) -> Int? {
     let result = try? @lexer_string.tokenize_int(payload)
     match result {
-      Ok(value) => Some(value)
+      Ok((value, _)) => Some(value)
       Err(_) => None
     }
   }

@@ -20,7 +20,7 @@
 
 ///|
 pub(open) trait FromStringView {
-  tokenize(StringView) -> Self raise StrConvError
+  tokenize(StringView) -> (Self, Int) raise StrConvError
 }
 
 ///|
@@ -54,22 +54,30 @@ pub impl FromStringView for Double with tokenize(str) {
 }
 
 ///|
-pub fn[A : FromStringView] tokenize(str : String) -> A raise StrConvError {
+pub fn[A : FromStringView] tokenize(
+  str : String,
+) -> (A, Int) raise StrConvError {
   FromStringView::tokenize(str)
 }
 
 ///|
 test "parse" {
-  let b : Bool = tokenize("true")
+  let (b, len_b) : (Bool, Int) = tokenize("true")
   inspect(b, content="true")
-  let i : Int = tokenize("12345")
+  assert_eq(len_b, 4)
+  let (i, len_i) : (Int, Int) = tokenize("12345")
   inspect(i, content="12345")
-  let i64 : Int64 = tokenize("9223372036854775807")
+  assert_eq(len_i, 5)
+  let (i64, len_i64) : (Int64, Int) = tokenize("9223372036854775807")
   assert_eq(i64, 9223372036854775807L)
-  let ui : UInt = tokenize("4294967295")
+  assert_eq(len_i64, 19)
+  let (ui, len_ui) : (UInt, Int) = tokenize("4294967295")
   inspect(ui, content="4294967295")
-  let ui64 : UInt64 = tokenize("18446744073709551615")
+  assert_eq(len_ui, 10)
+  let (ui64, len_ui64) : (UInt64, Int) = tokenize("18446744073709551615")
   assert_eq(ui64, 18446744073709551615UL)
-  let d : Double = tokenize("1234.56789")
+  assert_eq(len_ui64, 20)
+  let (d, len_d) : (Double, Int) = tokenize("1234.56789")
   assert_eq(d, 1234.56789)
+  assert_eq(len_d, 10)
 }

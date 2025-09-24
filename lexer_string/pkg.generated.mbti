@@ -2,19 +2,19 @@
 package "illusory0x0/lexer/lexer_string"
 
 // Values
-fn[A : FromStringView] tokenize(String) -> A raise StrConvError
+fn[A : FromStringView] tokenize(String) -> (A, Int) raise StrConvError
 
-fn tokenize_bool(StringView) -> Bool raise StrConvError
+fn tokenize_bool(StringView) -> (Bool, Int) raise StrConvError
 
-fn tokenize_double(StringView) -> Double raise StrConvError
+fn tokenize_double(StringView) -> (Double, Int) raise StrConvError
 
-fn tokenize_int(StringView, base? : Int) -> Int raise StrConvError
+fn tokenize_int(StringView, base? : Int) -> (Int, Int) raise StrConvError
 
-fn tokenize_int64(StringView, base? : Int) -> Int64 raise StrConvError
+fn tokenize_int64(StringView, base? : Int) -> (Int64, Int) raise StrConvError
 
-fn tokenize_uint(StringView, base? : Int) -> UInt raise StrConvError
+fn tokenize_uint(StringView, base? : Int) -> (UInt, Int) raise StrConvError
 
-fn tokenize_uint64(StringView, base? : Int) -> UInt64 raise StrConvError
+fn tokenize_uint64(StringView, base? : Int) -> (UInt64, Int) raise StrConvError
 
 // Errors
 pub(all) suberror StrConvError String
@@ -26,7 +26,7 @@ impl Show for StrConvError
 
 // Traits
 pub(open) trait FromStringView {
-  tokenize(StringView) -> Self raise StrConvError
+  tokenize(StringView) -> (Self, Int) raise StrConvError
 }
 impl FromStringView for Bool
 impl FromStringView for Int

@@ -682,6 +682,9 @@ test "corner cases" {
 
 ///|
 test "tokenize_double mantissa normalization boundary" {
-  inspect(tokenize_double("1.9999999999999999"), content="2")
-  inspect(tokenize_double("9007199254740991.5"), content="9007199254740992")
+  inspect(tokenize_double("1.9999999999999999"), content="(2, 18)")
+  inspect(
+    tokenize_double("9007199254740991.5"),
+    content="(9007199254740992, 18)",
+  )
 }

@@ -13,32 +13,32 @@
 // limitations under the License.
 
 ///|
-/// Parse a string and return the represented boolean value or an error.
-pub fn tokenize_bool(str : StringView) -> Bool raise StrConvError {
+/// Parse a string and return the represented boolean value and the length consumed, or an error.
+pub fn tokenize_bool(str : StringView) -> (Bool, Int) raise StrConvError {
   match str {
-    "1" | "t" | "T" | "true" | "TRUE" | "True" => true
-    "0" | "f" | "F" | "false" | "FALSE" | "False" => false
+    "1" | "t" | "T" | "true" | "TRUE" | "True" => (true, str.length())
+    "0" | "f" | "F" | "false" | "FALSE" | "False" => (false, str.length())
     _ => syntax_err()
   }
 }
 
 ///|
 test "tokenize_bool" {
-  let tests : Array[(String, Result[Bool, String])] = [
+  let tests : Array[(String, Result[(Bool, Int), String])] = [
     ("", Err(syntax_err_str)),
     ("zutomayo", Err(syntax_err_str)),
-    ("0", Ok(false)),
-    ("f", Ok(false)),
-    ("F", Ok(false)),
-    ("FALSE", Ok(false)),
-    ("false", Ok(false)),
-    ("False", Ok(false)),
-    ("1", Ok(true)),
-    ("t", Ok(true)),
-    ("T", Ok(true)),
-    ("TRUE", Ok(true)),
-    ("true", Ok(true)),
-    ("True", Ok(true)),
+    ("0", Ok((false, 1))),
+    ("f", Ok((false, 1))),
+    ("F", Ok((false, 1))),
+    ("FALSE", Ok((false, 5))),
+    ("false", Ok((false, 5))),
+    ("False", Ok((false, 5))),
+    ("1", Ok((true, 1))),
+    ("t", Ok((true, 1))),
+    ("T", Ok((true, 1))),
+    ("TRUE", Ok((true, 4))),
+    ("true", Ok((true, 4))),
+    ("True", Ok((true, 4))),
   ]
   for i in 0..<tests.length() {
     let t = tests[i]

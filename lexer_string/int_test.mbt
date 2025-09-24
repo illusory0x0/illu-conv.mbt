@@ -20,7 +20,7 @@ let base_err = "invalid base"
 
 ///|
 fn tokenize_as_result(s : String, base~ : Int) -> Result[Int64, String] {
-  try @lexer_string.tokenize_int64(s, base~) |> Ok catch {
+  try @lexer_string.tokenize_int64(s, base~).0 |> Ok catch {
     StrConvError(err) => Err(err)
   }
 }
@@ -57,13 +57,13 @@ test "tokenize_int64_uncovered_lines" {
 ///|
 test "@lexer_string.tokenize_int64/base_parsing" {
   // Test different bases
-  inspect(@lexer_string.tokenize_int64("1010", base=2), content="10")
-  inspect(@lexer_string.tokenize_int64("777", base=8), content="511")
-  inspect(@lexer_string.tokenize_int64("ff", base=16), content="255")
+  inspect(@lexer_string.tokenize_int64("1010", base=2), content="(10, 4)")
+  inspect(@lexer_string.tokenize_int64("777", base=8), content="(511, 3)")
+  inspect(@lexer_string.tokenize_int64("ff", base=16), content="(255, 2)")
   // Test auto-detection of base
-  inspect(@lexer_string.tokenize_int64("0xFF"), content="255")
-  inspect(@lexer_string.tokenize_int64("0b1010"), content="10")
-  inspect(@lexer_string.tokenize_int64("0o777"), content="511")
+  inspect(@lexer_string.tokenize_int64("0xFF"), content="(255, 4)")
+  inspect(@lexer_string.tokenize_int64("0b1010"), content="(10, 6)")
+  inspect(@lexer_string.tokenize_int64("0o777"), content="(511, 5)")
 }
 
 ///|
@@ -81,39 +81,39 @@ test "@lexer_string.tokenize_int64/boundary_values" {
   // Test minimum and maximum values
   inspect(
     @lexer_string.tokenize_int64("-9223372036854775808"),
-    content="-9223372036854775808",
+    content="(-9223372036854775808, 20)",
   )
   inspect(
     @lexer_string.tokenize_int64("9223372036854775807"),
-    content="9223372036854775807",
+    content="(9223372036854775807, 19)",
   )
   // Test with underscores
   inspect(
     @lexer_string.tokenize_int64("922_3372_0368_5477_5807"),
-    content="9223372036854775807",
+    content="(9223372036854775807, 23)",
   )
   // Test with different sign prefixes
-  inspect(@lexer_string.tokenize_int64("+42"), content="42")
-  inspect(@lexer_string.tokenize_int64("-42"), content="-42")
+  inspect(@lexer_string.tokenize_int64("+42"), content="(42, 3)")
+  inspect(@lexer_string.tokenize_int64("-42"), content="(-42, 3)")
 }
 
 ///|
 test "@lexer_string.tokenize_int64/base10" {
-  inspect(@lexer_string.tokenize_int64("12345"), content="12345")
-  inspect(@lexer_string.tokenize_int64("-12345"), content="-12345")
-  inspect(@lexer_string.tokenize_int64("0"), content="0")
-  inspect(@lexer_string.tokenize_int64("-0"), content="0")
+  inspect(@lexer_string.tokenize_int64("12345"), content="(12345, 5)")
+  inspect(@lexer_string.tokenize_int64("-12345"), content="(-12345, 6)")
+  inspect(@lexer_string.tokenize_int64("0"), content="(0, 1)")
+  inspect(@lexer_string.tokenize_int64("-0"), content="(0, 2)")
 }
 
 ///|
 test "@lexer_string.tokenize_int64/boundary_cases" {
   inspect(
     @lexer_string.tokenize_int64("9223372036854775807"),
-    content="9223372036854775807",
+    content="(9223372036854775807, 19)",
   )
   inspect(
     @lexer_string.tokenize_int64("-9223372036854775808"),
-    content="-9223372036854775808",
+    content="(-9223372036854775808, 20)",
   )
 }
 
@@ -137,7 +137,7 @@ test "edge cases" {
   // Underscore is allowed between the prefix and the first digit
   inspect(
     try? @lexer_string.tokenize_int64("0x_DEADBEEF"),
-    content="Ok(3735928559)",
+    content="Ok((3735928559, 11))",
   )
 }
 
@@ -145,40 +145,52 @@ test "edge cases" {
 test "more edge cases" {
   inspect(
     try? @lexer_string.tokenize_int64("0b01", base=16),
-    content="Ok(2817)",
+    content="Ok((2817, 4))",
   )
   inspect(
     try? @lexer_string.tokenize_int64("0o01", base=16),
     content="Err(invalid syntax)",
   )
-  inspect(try? @lexer_string.tokenize_int64("0x01", base=16), content="Ok(1)")
+  inspect(
+    try? @lexer_string.tokenize_int64("0x01", base=16),
+    content="Ok((1, 4))",
+  )
   inspect(
     try? @lexer_string.tokenize_int64("0b01", base=16),
-    content="Ok(2817)",
+    content="Ok((2817, 4))",
   )
   inspect(
     try? @lexer_string.tokenize_int64("0o01", base=16),
     content="Err(invalid syntax)",
   )
-  inspect(try? @lexer_string.tokenize_int64("0x01", base=16), content="Ok(1)")
+  inspect(
+    try? @lexer_string.tokenize_int64("0x01", base=16),
+    content="Ok((1, 4))",
+  )
   inspect(
     try? @lexer_string.tokenize_int64("0b01", base=16),
-    content="Ok(2817)",
+    content="Ok((2817, 4))",
   )
   inspect(
     try? @lexer_string.tokenize_int64("0o01", base=16),
     content="Err(invalid syntax)",
   )
-  inspect(try? @lexer_string.tokenize_int64("0x01", base=16), content="Ok(1)")
+  inspect(
+    try? @lexer_string.tokenize_int64("0x01", base=16),
+    content="Ok((1, 4))",
+  )
   inspect(
     try? @lexer_string.tokenize_int64("0b01", base=16),
-    content="Ok(2817)",
+    content="Ok((2817, 4))",
   )
   inspect(
     try? @lexer_string.tokenize_int64("0o01", base=16),
     content="Err(invalid syntax)",
   )
-  inspect(try? @lexer_string.tokenize_int64("0x01", base=16), content="Ok(1)")
+  inspect(
+    try? @lexer_string.tokenize_int64("0x01", base=16),
+    content="Ok((1, 4))",
+  )
   inspect(
     try? @lexer_string.tokenize_int64("0b01", base=10),
     content="Err(invalid syntax)",

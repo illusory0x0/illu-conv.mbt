@@ -8,16 +8,19 @@ A MoonBit library for parsing various data types from `BytesView`, providing eff
 ///|
 test "basic usage" {
   // Parse integers from bytes
-  let num = @lexer_bytes.tokenize_int(b"42")
+  let (num, advance_len) = @lexer_bytes.tokenize_int(b"42")
   @json.inspect(num, content=42)
+  @json.inspect(advance_len, content=2)
 
   // Parse with different bases
-  let hex = @lexer_bytes.tokenize_int(b"ff", base=16)
+  let (hex, advance_len) = @lexer_bytes.tokenize_int(b"ff", base=16)
   @json.inspect(hex, content=255)
+  @json.inspect(advance_len, content=2)
 
   // Parse booleans
-  let flag = @lexer_bytes.tokenize_bool(b"true")
+  let (flag, advance_len) = @lexer_bytes.tokenize_bool(b"true")
   @json.inspect(flag, content=true)
+  @json.inspect(advance_len, content=4)
 }
 ```
 
@@ -41,10 +44,11 @@ test "error handling" {
   let safe_result = @lexer_bytes.tokenize_double(b"not_a_number") catch {
     @lexer_bytes.StrConvError(msg) => {
       @json.inspect(msg, content="invalid syntax")
-      0.0
+      (0.0, 0)
     }
   }
-  @json.inspect(safe_result, content=0.0)
+  let (val, _) = safe_result
+  @json.inspect(val, content=0.0)
 }
 ```
 
@@ -58,17 +62,31 @@ Parse integers from `BytesView` with optional base specification:
 ///|
 test "tokenize_int examples" {
   // Default base 10
-  @json.inspect(@lexer_bytes.tokenize_int(b"123"), content=123)
-  @json.inspect(@lexer_bytes.tokenize_int(b"-456"), content=-456)
+  let (val1, advance_len) = @lexer_bytes.tokenize_int(b"123")
+  @json.inspect(val1, content=123)
+  @json.inspect(advance_len, content=3)
+  let (val2, advance_len) = @lexer_bytes.tokenize_int(b"-456")
+  @json.inspect(val2, content=-456)
+  @json.inspect(advance_len, content=4)
 
   // Different bases
-  @json.inspect(@lexer_bytes.tokenize_int(b"ff", base=16), content=255)
-  @json.inspect(@lexer_bytes.tokenize_int(b"1010", base=2), content=10)
-  @json.inspect(@lexer_bytes.tokenize_int(b"77", base=8), content=63)
+  let (val3, advance_len) = @lexer_bytes.tokenize_int(b"ff", base=16)
+  @json.inspect(val3, content=255)
+  @json.inspect(advance_len, content=2)
+  let (val4, advance_len) = @lexer_bytes.tokenize_int(b"1010", base=2)
+  @json.inspect(val4, content=10)
+  @json.inspect(advance_len, content=4)
+  let (val5, advance_len) = @lexer_bytes.tokenize_int(b"77", base=8)
+  @json.inspect(val5, content=63)
+  @json.inspect(advance_len, content=2)
 
   // Edge cases
-  @json.inspect(@lexer_bytes.tokenize_int(b"0"), content=0)
-  @json.inspect(@lexer_bytes.tokenize_int(b"+42"), content=42)
+  let (val6, advance_len) = @lexer_bytes.tokenize_int(b"0")
+  @json.inspect(val6, content=0)
+  @json.inspect(advance_len, content=1)
+  let (val7, advance_len) = @lexer_bytes.tokenize_int(b"+42")
+  @json.inspect(val7, content=42)
+  @json.inspect(advance_len, content=3)
 }
 ```
 
@@ -79,24 +97,23 @@ Parse 64-bit integers from `BytesView`:
 ```moonbit
 ///|
 test "tokenize_int64 examples" {
-  inspect(
-    @lexer_bytes.tokenize_int64(b"9223372036854775807"),
-    content="9223372036854775807",
-  )
-  inspect(
-    @lexer_bytes.tokenize_int64(b"-9223372036854775808"),
-    content="-9223372036854775808",
-  )
+  let (val1, advance_len) = @lexer_bytes.tokenize_int64(b"9223372036854775807")
+  inspect(val1, content="9223372036854775807")
+  inspect(advance_len, content="19")
+  let (val2, advance_len) = @lexer_bytes.tokenize_int64(b"-9223372036854775808")
+  inspect(val2, content="-9223372036854775808")
+  inspect(advance_len, content="20")
 
   // With different bases
-  inspect(
-    @lexer_bytes.tokenize_int64(b"deadbeef", base=16),
-    content="3735928559",
+  let (val3, advance_len) = @lexer_bytes.tokenize_int64(b"deadbeef", base=16)
+  inspect(val3, content="3735928559")
+  inspect(advance_len, content="8")
+  let (val4, advance_len) = @lexer_bytes.tokenize_int64(
+    b"1111000011110000",
+    base=2,
   )
-  inspect(
-    @lexer_bytes.tokenize_int64(b"1111000011110000", base=2),
-    content="61680",
-  )
+  inspect(val4, content="61680")
+  inspect(advance_len, content="16")
 }
 ```
 
@@ -107,15 +124,20 @@ Parse unsigned integers from `BytesView`:
 ```moonbit
 ///|
 test "tokenize_uint examples" {
-  inspect(@lexer_bytes.tokenize_uint(b"4294967295"), content="4294967295")
-  inspect(@lexer_bytes.tokenize_uint(b"0"), content="0")
+  let (val1, advance_len) = @lexer_bytes.tokenize_uint(b"4294967295")
+  inspect(val1, content="4294967295")
+  inspect(advance_len, content="10")
+  let (val2, advance_len) = @lexer_bytes.tokenize_uint(b"0")
+  inspect(val2, content="0")
+  inspect(advance_len, content="1")
 
   // With different bases
-  inspect(
-    @lexer_bytes.tokenize_uint(b"ffffffff", base=16),
-    content="4294967295",
-  )
-  inspect(@lexer_bytes.tokenize_uint(b"377", base=8), content="255")
+  let (val3, advance_len) = @lexer_bytes.tokenize_uint(b"ffffffff", base=16)
+  inspect(val3, content="4294967295")
+  inspect(advance_len, content="8")
+  let (val4, advance_len) = @lexer_bytes.tokenize_uint(b"377", base=8)
+  inspect(val4, content="255")
+  inspect(advance_len, content="3")
 }
 ```
 
@@ -126,17 +148,14 @@ Parse 64-bit unsigned integers from `BytesView`:
 ```moonbit
 ///|
 test "tokenize_uint64 examples" {
-  inspect(
-    @lexer_bytes.tokenize_uint64(b"18446744073709551615"),
-    content="18446744073709551615",
-  )
-  inspect(@lexer_bytes.tokenize_uint64(b"0"), content="0")
+  let (val1, _) = @lexer_bytes.tokenize_uint64(b"18446744073709551615")
+  inspect(val1, content="18446744073709551615")
+  let (val2, _) = @lexer_bytes.tokenize_uint64(b"0")
+  inspect(val2, content="0")
 
   // With different bases
-  inspect(
-    @lexer_bytes.tokenize_uint64(b"ffffffffffffffff", base=16),
-    content="18446744073709551615",
-  )
+  let (val3, _) = @lexer_bytes.tokenize_uint64(b"ffffffffffffffff", base=16)
+  inspect(val3, content="18446744073709551615")
 }
 ```
 
@@ -149,17 +168,22 @@ Parse double-precision floating point numbers from `BytesView`:
 ```moonbit
 ///|
 test "tokenize_double examples" {
-  @json.inspect(@lexer_bytes.tokenize_double(b"3.14159"), content=3.14159)
-  @json.inspect(@lexer_bytes.tokenize_double(b"-2.718"), content=-2.718)
-  @json.inspect(@lexer_bytes.tokenize_double(b"0.0"), content=0.0)
+  let (val1, _) = @lexer_bytes.tokenize_double(b"3.14159")
+  @json.inspect(val1, content=3.14159)
+  let (val2, _) = @lexer_bytes.tokenize_double(b"-2.718")
+  @json.inspect(val2, content=-2.718)
+  let (val3, _) = @lexer_bytes.tokenize_double(b"0.0")
+  @json.inspect(val3, content=0.0)
 
   // Scientific notation
-  @json.inspect(@lexer_bytes.tokenize_double(b"1.5e10"), content=15000000000.0)
-  @json.inspect(@lexer_bytes.tokenize_double(b"2.5e-3"), content=0.0025)
+  let (val4, _) = @lexer_bytes.tokenize_double(b"1.5e10")
+  @json.inspect(val4, content=15000000000.0)
+  let (val5, _) = @lexer_bytes.tokenize_double(b"2.5e-3")
+  @json.inspect(val5, content=0.0025)
 
   // Special values  
-  let inf_val = @lexer_bytes.tokenize_double(b"inf")
-  let neg_inf_val = @lexer_bytes.tokenize_double(b"-inf")
+  let (inf_val, _) = @lexer_bytes.tokenize_double(b"inf")
+  let (neg_inf_val, _) = @lexer_bytes.tokenize_double(b"-inf")
   inspect(inf_val > 0.0 && inf_val.is_inf(), content="true")
   inspect(neg_inf_val < 0.0 && neg_inf_val.is_inf(), content="true")
 }
@@ -175,16 +199,24 @@ Parse boolean values from `BytesView`:
 ///|
 test "tokenize_bool examples" {
   // True values
-  @json.inspect(@lexer_bytes.tokenize_bool(b"true"), content=true)
-  @json.inspect(@lexer_bytes.tokenize_bool(b"True"), content=true)
-  @json.inspect(@lexer_bytes.tokenize_bool(b"TRUE"), content=true)
-  @json.inspect(@lexer_bytes.tokenize_bool(b"1"), content=true)
+  let (val1, _) = @lexer_bytes.tokenize_bool(b"true")
+  @json.inspect(val1, content=true)
+  let (val2, _) = @lexer_bytes.tokenize_bool(b"True")
+  @json.inspect(val2, content=true)
+  let (val3, _) = @lexer_bytes.tokenize_bool(b"TRUE")
+  @json.inspect(val3, content=true)
+  let (val4, _) = @lexer_bytes.tokenize_bool(b"1")
+  @json.inspect(val4, content=true)
 
   // False values
-  @json.inspect(@lexer_bytes.tokenize_bool(b"false"), content=false)
-  @json.inspect(@lexer_bytes.tokenize_bool(b"False"), content=false)
-  @json.inspect(@lexer_bytes.tokenize_bool(b"FALSE"), content=false)
-  @json.inspect(@lexer_bytes.tokenize_bool(b"0"), content=false)
+  let (val5, _) = @lexer_bytes.tokenize_bool(b"false")
+  @json.inspect(val5, content=false)
+  let (val6, _) = @lexer_bytes.tokenize_bool(b"False")
+  @json.inspect(val6, content=false)
+  let (val7, _) = @lexer_bytes.tokenize_bool(b"FALSE")
+  @json.inspect(val7, content=false)
+  let (val8, _) = @lexer_bytes.tokenize_bool(b"0")
+  @json.inspect(val8, content=false)
 }
 ```
 
@@ -198,19 +230,19 @@ Generic parsing function that works with any type implementing `FromBytesView`:
 ///|
 test "generic parse examples" {
   // Parse integers
-  let int_val : Int = @lexer_bytes.tokenize(b"42")
+  let (int_val, _) : (Int, Int) = @lexer_bytes.tokenize(b"42")
   @json.inspect(int_val, content=42)
 
   // Parse doubles
-  let double_val : Double = @lexer_bytes.tokenize(b"3.14")
+  let (double_val, _) : (Double, Int) = @lexer_bytes.tokenize(b"3.14")
   @json.inspect(double_val, content=3.14)
 
   // Parse booleans  
-  let bool_val : Bool = @lexer_bytes.tokenize(b"true")
+  let (bool_val, _) : (Bool, Int) = @lexer_bytes.tokenize(b"true")
   @json.inspect(bool_val, content=true)
 
   // Parse unsigned integers
-  let uint_val : UInt = @lexer_bytes.tokenize(b"123")
+  let (uint_val, _) : (UInt, Int) = @lexer_bytes.tokenize(b"123")
   inspect(uint_val, content="123")
 }
 ```
@@ -230,14 +262,13 @@ The `FromBytesView` trait enables types to be parsed from `BytesView`. Built-in 
 ///|
 test "trait usage examples" {
   // Using trait methods directly
-  let int_result = @lexer_bytes.FromBytesView::from(b"100")
-  let int_val : Int = int_result
+  let (int_val, _) : (Int, Int) = @lexer_bytes.FromBytesView::from(b"100")
   @json.inspect(int_val, content=100)
-  let bool_result = @lexer_bytes.FromBytesView::from(b"false")
-  let bool_val : Bool = bool_result
+  let (bool_val, _) : (Bool, Int) = @lexer_bytes.FromBytesView::from(b"false")
   @json.inspect(bool_val, content=false)
-  let double_result = @lexer_bytes.FromBytesView::from(b"2.718")
-  let double_val : Double = double_result
+  let (double_val, _) : (Double, Int) = @lexer_bytes.FromBytesView::from(
+    b"2.718",
+  )
   @json.inspect(double_val, content=2.718)
 }
 ```
@@ -290,9 +321,9 @@ test "bytesview usage" {
   let part3 = b"789"
 
   // Parse each part individually
-  let num1 = @lexer_bytes.tokenize_int(part1)
-  let num2 = @lexer_bytes.tokenize_int(part2)
-  let num3 = @lexer_bytes.tokenize_int(part3)
+  let (num1, _) = @lexer_bytes.tokenize_int(part1)
+  let (num2, _) = @lexer_bytes.tokenize_int(part2)
+  let (num3, _) = @lexer_bytes.tokenize_int(part3)
   inspect([num1, num2, num3], content="[123, 456, 789]")
 }
 ```
@@ -308,10 +339,14 @@ test "base conversion showcase" {
   let hex = b"d6"
 
   // All represent the same number (214 in decimal)
-  @json.inspect(@lexer_bytes.tokenize_int(binary, base=2), content=214)
-  @json.inspect(@lexer_bytes.tokenize_int(octal, base=8), content=214)
-  @json.inspect(@lexer_bytes.tokenize_int(decimal, base=10), content=214)
-  @json.inspect(@lexer_bytes.tokenize_int(hex, base=16), content=214)
+  let (val1, _) = @lexer_bytes.tokenize_int(binary, base=2)
+  @json.inspect(val1, content=214)
+  let (val2, _) = @lexer_bytes.tokenize_int(octal, base=8)
+  @json.inspect(val2, content=214)
+  let (val3, _) = @lexer_bytes.tokenize_int(decimal, base=10)
+  @json.inspect(val3, content=214)
+  let (val4, _) = @lexer_bytes.tokenize_int(hex, base=16)
+  @json.inspect(val4, content=214)
 }
 ```
 
